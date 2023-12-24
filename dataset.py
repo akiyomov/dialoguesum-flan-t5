@@ -4,7 +4,7 @@ from transformers import AutoTokenizer
 def load_custom_dataset(dataset_name,tokenizer):
     dataset = load_dataset(dataset_name)
     tokenized_datasets = tokenize_datasets(dataset, tokenizer)
-    return 
+    return tokenized_datasets
 
 def tokenize_function(example, tokenizer):
     start_prompt = 'Summarize the following conversation.\n\n'
