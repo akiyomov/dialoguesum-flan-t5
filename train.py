@@ -13,16 +13,10 @@ def setup_trainer(model, training_args, dataset):
 
 def train_model(trainer):
     print("Training started...")
-    for epoch in range(trainer.args.num_train_epochs):
-        print(f"Epoch {epoch + 1}/{trainer.args.num_train_epochs}:")
-        for step, batch in enumerate(trainer.get_train_dataloader()):
-            trainer.train()
-            if step % trainer.args.logging_steps == 0:
-                print(f"  Step {step}/{len(trainer.get_train_dataloader())}:")
-                print(f"    Learning Rate: {trainer.lr_scheduler.get_lr()}")
-                print(f"    Loss: {trainer.model.training_loss:.4f}")
-                # Add printing of additional information here if needed
+    trainer.train()
+    trainer.save_model()
     print("Training finished.")
+
 
 if __name__ == "__main__":
     model, tokenizer = load_pretrained_model('google/flan-t5-base')
@@ -35,6 +29,7 @@ if __name__ == "__main__":
         per_device_train_batch_size=6,
         per_device_eval_batch_size=6,
         weight_decay=0.01,
+        logging_steps=100,
         logging_dir='./logs', 
         report_to='tensorboard', 
     )
