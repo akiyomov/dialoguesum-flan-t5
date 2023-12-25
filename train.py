@@ -1,13 +1,22 @@
-from transformers import TrainingArguments, Trainer, logging
+from transformers import Trainer, TrainingArguments
+import transformers
+from torch.utils.tensorboard import SummaryWriter
 from dataset import load_custom_dataset
 from model import load_pretrained_model
 
 def setup_trainer(model, training_args, dataset):
+    tensorboard_writer = SummaryWriter(log_dir=training_args.logging_dir)
+    tensorboard_callback = transformers.TrainerCallback(
+        tensorboard_writer=tensorboard_writer,
+        log_dir=training_args.logging_dir,
+    )
+
     trainer = Trainer(
         model=model,
         args=training_args,
         train_dataset=dataset['train'],
         eval_dataset=dataset['validation'],
+        callbacks=[tensorboard_callback],  # Add the TensorBoard callback here
     )
     return trainer
 
@@ -33,7 +42,7 @@ if __name__ == "__main__":
         logging_dir='./logs', 
         report_to='tensorboard', 
     )
-    logging.set_verbosity_info() 
+   
     trainer = setup_trainer(model, training_args,dataset)
 
     train_model(trainer)
