@@ -1,22 +1,29 @@
 from transformers import Trainer, TrainingArguments
 import transformers
 from torch.utils.tensorboard import SummaryWriter
+from transformers import TrainerCallback
 from dataset import load_custom_dataset
 from model import load_pretrained_model
 
+class CustomTensorBoardCallback(TrainerCallback):
+    def __init__(self, log_dir):
+        self.writer = SummaryWriter(log_dir=log_dir)
+
+    def on_train_batch_end(self, args, state, control, logs, **kwargs):
+        step = state.global_step
+        self.writer.add_scalar("Loss/train", logs.get("loss"), step)
+        self.writer.add_scalar("Learning_rate/train", logs.get("learning_rate"), step)
+
+
 def setup_trainer(model, training_args, dataset):
-    tensorboard_writer = SummaryWriter(log_dir=training_args.logging_dir)
-    tensorboard_callback = transformers.TrainerCallback(
-        tensorboard_writer=tensorboard_writer,
-        log_dir=training_args.logging_dir,
-    )
+    tensorboard_callback = CustomTensorBoardCallback(log_dir=training_args.logging_dir)
 
     trainer = Trainer(
         model=model,
         args=training_args,
         train_dataset=dataset['train'],
         eval_dataset=dataset['validation'],
-        callbacks=[tensorboard_callback],  # Add the TensorBoard callback here
+        callbacks=[tensorboard_callback],  # Add the CustomTensorBoardCallback here
     )
     return trainer
 
