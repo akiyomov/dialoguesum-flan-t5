@@ -4,6 +4,7 @@ from transformers import AutoTokenizer
 def load_custom_dataset(dataset_name,tokenizer):
     dataset = load_dataset(dataset_name)
     tokenized_datasets = tokenize_datasets(dataset, tokenizer)
+    tokenized_datasets = tokenized_datasets.filter(lambda example, index: index % 100 == 0, with_indices=True)
     return tokenized_datasets
 
 def tokenize_function(example, tokenizer):
