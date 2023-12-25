@@ -40,10 +40,12 @@ if __name__ == "__main__":
 
     training_args = TrainingArguments(
         output_dir='./dialogue-summary-training', 
-        learning_rate=1e-5,
+        learning_rate=5e-5,
         num_train_epochs=5,
         per_device_train_batch_size=6,
         per_device_eval_batch_size=6,
+        warmup_steps=500,
+        lr_scheduler_type='cosine',
         weight_decay=0.01,
         logging_steps=100,
         logging_dir='./logs', 
